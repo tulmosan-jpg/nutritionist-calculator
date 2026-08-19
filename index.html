@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>영양사 이수기준 계산기</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <link rel="stylesheet" as="style" crossorigin
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <style>
         :root {
             --swiss-blue: #1b5cff;
@@ -74,9 +76,17 @@
         }
 
         @keyframes pop {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+            }
         }
 
         /* Scrollbar styling for a cleaner look */
@@ -84,31 +94,38 @@
             width: 8px;
             height: 8px;
         }
+
         ::-webkit-scrollbar-track {
             background: transparent;
         }
+
         ::-webkit-scrollbar-thumb {
             background: #d1d5db;
             border-radius: 4px;
         }
+
         ::-webkit-scrollbar-thumb:hover {
             background: #9ca3af;
         }
     </style>
 </head>
+
 <body class="min-h-screen p-3 sm:p-6 lg:p-12 flex flex-col items-center">
 
     <!-- Main Dashboard Container -->
-    <main class="w-full max-w-[1500px] bg-white border border-[#e5e5e5] shadow-sm rounded-xl overflow-hidden flex flex-col">
+    <main
+        class="w-full max-w-[1500px] bg-white border border-[#e5e5e5] shadow-sm rounded-xl overflow-hidden flex flex-col">
 
         <!-- Header -->
         <header class="px-5 sm:px-8 pt-6 sm:pt-8 pb-4 border-b border-[#e5e5e5]">
             <div class="flex flex-row justify-between items-start gap-3">
                 <div>
                     <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900">영양사 이수기준 계산기</h1>
-                    <p class="text-[13px] sm:text-sm text-gray-500 mt-1.5 sm:mt-2 font-medium tracking-tight">2010.5.23 이후 입학자용 · 유한대학교 식품영양학과</p>
+                    <p class="text-[13px] sm:text-sm text-gray-500 mt-1.5 sm:mt-2 font-medium tracking-tight">유한대학교
+                        식품영양학과</p>
                 </div>
-                <button id="reset-btn" class="shrink-0 text-[13px] sm:text-sm font-semibold text-gray-600 hover:text-black transition-colors px-3 py-1.5 rounded-md hover:bg-gray-100 border border-gray-200">
+                <button id="reset-btn"
+                    class="shrink-0 text-[13px] sm:text-sm font-semibold text-gray-600 hover:text-black transition-colors px-3 py-1.5 rounded-md hover:bg-gray-100 border border-gray-200">
                     초기화
                 </button>
             </div>
@@ -118,7 +135,8 @@
         <section class="px-5 sm:px-8 pt-6 sm:pt-8 pb-6 relative">
             <!-- Status -->
             <div class="pb-5 sm:pb-2">
-                <h2 id="main-status" class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tighter text-[#1b5cff] transition-colors duration-300">
+                <h2 id="main-status"
+                    class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tighter text-[#1b5cff] transition-colors duration-300">
                     응시조건 충족
                 </h2>
             </div>
@@ -128,21 +146,24 @@
                 <div class="flex flex-col items-start">
                     <span class="text-xs sm:text-sm font-bold text-gray-900 mb-0.5 sm:mb-1 tracking-tight">총 과목</span>
                     <div class="flex items-baseline gap-0.5 sm:gap-1">
-                        <span id="stat-total-sub" class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tighter number-transition">0</span>
+                        <span id="stat-total-sub"
+                            class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tighter number-transition">0</span>
                         <span class="text-lg sm:text-2xl lg:text-3xl font-medium text-gray-400">/18</span>
                     </div>
                 </div>
                 <div class="flex flex-col items-start">
                     <span class="text-xs sm:text-sm font-bold text-gray-900 mb-0.5 sm:mb-1 tracking-tight">총 학점</span>
                     <div class="flex items-baseline gap-0.5 sm:gap-1">
-                        <span id="stat-total-cred" class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tighter number-transition">0</span>
+                        <span id="stat-total-cred"
+                            class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tighter number-transition">0</span>
                         <span class="text-lg sm:text-2xl lg:text-3xl font-medium text-gray-400">/52</span>
                     </div>
                 </div>
                 <div class="flex flex-col items-start">
                     <span class="text-xs sm:text-sm font-bold text-gray-900 mb-0.5 sm:mb-1 tracking-tight">충족 영역</span>
                     <div class="flex items-baseline gap-0.5 sm:gap-1">
-                        <span id="stat-total-areas" class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tighter number-transition">0</span>
+                        <span id="stat-total-areas"
+                            class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tighter number-transition">0</span>
                         <span class="text-lg sm:text-2xl lg:text-3xl font-medium text-gray-400">/5</span>
                     </div>
                 </div>
@@ -159,7 +180,8 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 h-full">
 
                 <!-- Card 1: 기초 -->
-                <div class="bg-white border border-[#e5e5e5] rounded-lg flex flex-col category-card" data-cat="기초" data-min-sub="2" data-min-cred="6">
+                <div class="bg-white border border-[#e5e5e5] rounded-lg flex flex-col category-card" data-cat="기초"
+                    data-min-sub="2" data-min-cred="6">
                     <div class="px-5 py-4 border-b border-[#e5e5e5] flex justify-between items-baseline">
                         <h3 class="text-lg font-bold tracking-tight">기초</h3>
                         <span class="text-xs font-medium text-gray-500">최소 2과목 · 6학점</span>
@@ -168,32 +190,39 @@
                         <label class="flex justify-between items-center cursor-pointer group">
                             <div class="flex items-center gap-3">
                                 <input type="checkbox" class="swiss-checkbox subject-cb" data-group="생리학" data-cred="3">
-                                <span class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">생리학</span>
+                                <span
+                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">생리학</span>
                             </div>
                             <span class="text-sm font-mono text-gray-500">3</span>
                         </label>
                         <label class="flex justify-between items-center cursor-pointer group">
                             <div class="flex items-center gap-3">
                                 <input type="checkbox" class="swiss-checkbox subject-cb" data-group="생화학" data-cred="3">
-                                <span class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">생화학</span>
+                                <span
+                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">생화학</span>
                             </div>
                             <span class="text-sm font-mono text-gray-500">3</span>
                         </label>
                         <label class="flex justify-between items-center cursor-pointer group">
                             <div class="flex items-center gap-3">
-                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="공중보건학" data-cred="2">
-                                <span class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">공중보건학</span>
+                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="공중보건학"
+                                    data-cred="2">
+                                <span
+                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">공중보건학</span>
                             </div>
                             <span class="text-sm font-mono text-gray-500">2</span>
                         </label>
                     </div>
                     <div class="px-5 py-3 border-t border-[#e5e5e5] text-right bg-gray-50/50 rounded-b-lg mt-auto">
-                        <span class="text-sm font-medium text-gray-600"><span class="card-sub-val font-bold text-gray-900">0</span>과목 · <span class="card-cred-val font-bold text-gray-900">0</span>학점</span>
+                        <span class="text-sm font-medium text-gray-600"><span
+                                class="card-sub-val font-bold text-gray-900">0</span>과목 · <span
+                                class="card-cred-val font-bold text-gray-900">0</span>학점</span>
                     </div>
                 </div>
 
                 <!-- Card 2: 영양 -->
-                <div class="bg-white border border-[#e5e5e5] rounded-lg flex flex-col category-card" data-cat="영양" data-min-sub="6" data-min-cred="19">
+                <div class="bg-white border border-[#e5e5e5] rounded-lg flex flex-col category-card" data-cat="영양"
+                    data-min-sub="6" data-min-cred="19">
                     <div class="px-5 py-4 border-b border-[#e5e5e5] flex justify-between items-baseline">
                         <h3 class="text-lg font-bold tracking-tight">영양</h3>
                         <span class="text-xs font-medium text-gray-500">최소 6과목 · 19학점</span>
@@ -201,75 +230,96 @@
                     <div class="p-5 flex-grow space-y-3">
                         <label class="flex justify-between items-center cursor-pointer group">
                             <div class="flex items-center gap-3">
-                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="기초영양학" data-cred="3">
-                                <span class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">기초영양학(1)</span>
+                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="기초영양학"
+                                    data-cred="3">
+                                <span
+                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">기초영양학(1)</span>
                             </div>
                             <span class="text-sm font-mono text-gray-500">3</span>
                         </label>
                         <label class="flex justify-between items-center cursor-pointer group">
                             <div class="flex items-center gap-3">
-                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="기초영양학" data-cred="2">
-                                <span class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">기초영양학(2)</span>
+                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="기초영양학"
+                                    data-cred="2">
+                                <span
+                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">기초영양학(2)</span>
                             </div>
                             <span class="text-sm font-mono text-gray-500">2</span>
                         </label>
                         <label class="flex justify-between items-center cursor-pointer group">
                             <div class="flex items-center gap-3">
-                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="고급영양학" data-cred="3">
-                                <span class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">고급영양학</span>
+                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="고급영양학"
+                                    data-cred="3">
+                                <span
+                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">고급영양학</span>
                             </div>
                             <span class="text-sm font-mono text-gray-500">3</span>
                         </label>
                         <label class="flex justify-between items-center cursor-pointer group">
                             <div class="flex items-center gap-3">
-                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="생애주기영양학" data-cred="3">
-                                <span class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">생애주기영양학</span>
+                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="생애주기영양학"
+                                    data-cred="3">
+                                <span
+                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">생애주기영양학</span>
                             </div>
                             <span class="text-sm font-mono text-gray-500">3</span>
                         </label>
                         <label class="flex justify-between items-center cursor-pointer group">
                             <div class="flex items-center gap-3">
-                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="식사요법" data-cred="3">
-                                <span class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">식사요법(1)</span>
+                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="식사요법"
+                                    data-cred="3">
+                                <span
+                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">식사요법(1)</span>
                             </div>
                             <span class="text-sm font-mono text-gray-500">3</span>
                         </label>
                         <label class="flex justify-between items-center cursor-pointer group">
                             <div class="flex items-center gap-3">
-                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="식사요법" data-cred="3">
-                                <span class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">식사요법(2)및실습</span>
+                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="식사요법"
+                                    data-cred="3">
+                                <span
+                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">식사요법(2)및실습</span>
                             </div>
                             <span class="text-sm font-mono text-gray-500">3</span>
                         </label>
                         <label class="flex justify-between items-center cursor-pointer group">
                             <div class="flex items-center gap-3">
-                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="영양교육" data-cred="3">
-                                <span class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">영양교육</span>
+                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="영양교육"
+                                    data-cred="3">
+                                <span
+                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">영양교육</span>
                             </div>
                             <span class="text-sm font-mono text-gray-500">3</span>
                         </label>
                         <label class="flex justify-between items-center cursor-pointer group">
                             <div class="flex items-center gap-3">
-                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="지역사회영양학" data-cred="3">
-                                <span class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">지역사회영양학</span>
+                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="지역사회영양학"
+                                    data-cred="3">
+                                <span
+                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">지역사회영양학</span>
                             </div>
                             <span class="text-sm font-mono text-gray-500">3</span>
                         </label>
                         <label class="flex justify-between items-center cursor-pointer group">
                             <div class="flex items-center gap-3">
-                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="영양판정" data-cred="3">
-                                <span class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">영양판정</span>
+                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="영양판정"
+                                    data-cred="3">
+                                <span
+                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">영양판정</span>
                             </div>
                             <span class="text-sm font-mono text-gray-500">3</span>
                         </label>
                     </div>
                     <div class="px-5 py-3 border-t border-[#e5e5e5] text-right bg-gray-50/50 rounded-b-lg mt-auto">
-                        <span class="text-sm font-medium text-gray-600"><span class="card-sub-val font-bold text-gray-900">0</span>과목 · <span class="card-cred-val font-bold text-gray-900">0</span>학점</span>
+                        <span class="text-sm font-medium text-gray-600"><span
+                                class="card-sub-val font-bold text-gray-900">0</span>과목 · <span
+                                class="card-cred-val font-bold text-gray-900">0</span>학점</span>
                     </div>
                 </div>
 
                 <!-- Card 3: 식품 및 조리 -->
-                <div class="bg-white border border-[#e5e5e5] rounded-lg flex flex-col category-card" data-cat="식품 및 조리" data-min-sub="5" data-min-cred="14">
+                <div class="bg-white border border-[#e5e5e5] rounded-lg flex flex-col category-card" data-cat="식품 및 조리"
+                    data-min-sub="5" data-min-cred="14">
                     <div class="px-5 py-4 border-b border-[#e5e5e5] flex justify-between items-baseline">
                         <h3 class="text-lg font-bold tracking-tight">식품 및 조리</h3>
                         <span class="text-xs font-medium text-gray-500">최소 5과목 · 14학점</span>
@@ -278,53 +328,67 @@
                         <label class="flex justify-between items-center cursor-pointer group">
                             <div class="flex items-center gap-3">
                                 <input type="checkbox" class="swiss-checkbox subject-cb" data-group="식품학" data-cred="3">
-                                <span class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">식품학</span>
+                                <span
+                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">식품학</span>
                             </div>
                             <span class="text-sm font-mono text-gray-500">3</span>
                         </label>
                         <label class="flex justify-between items-center cursor-pointer group">
                             <div class="flex items-center gap-3">
-                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="식품화학" data-cred="3">
-                                <span class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">고급식품학</span>
+                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="식품화학"
+                                    data-cred="3">
+                                <span
+                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">고급식품학</span>
                             </div>
                             <span class="text-sm font-mono text-gray-500">3</span>
                         </label>
                         <label class="flex justify-between items-center cursor-pointer group">
                             <div class="flex items-center gap-3">
-                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="식품미생물학" data-cred="3">
-                                <span class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">식품미생물학</span>
+                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="식품미생물학"
+                                    data-cred="3">
+                                <span
+                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">식품미생물학</span>
                             </div>
                             <span class="text-sm font-mono text-gray-500">3</span>
                         </label>
                         <label class="flex justify-between items-center cursor-pointer group">
                             <div class="flex items-center gap-3">
-                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="식품가공및저장학" data-cred="3">
-                                <span class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">식품가공학및실습</span>
+                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="식품가공및저장학"
+                                    data-cred="3">
+                                <span
+                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">식품가공학및실습</span>
                             </div>
                             <span class="text-sm font-mono text-gray-500">3</span>
                         </label>
                         <label class="flex justify-between items-center cursor-pointer group">
                             <div class="flex items-center gap-3">
-                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="조리원리" data-cred="3">
-                                <span class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">조리원리</span>
+                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="조리원리"
+                                    data-cred="3">
+                                <span
+                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">조리원리</span>
                             </div>
                             <span class="text-sm font-mono text-gray-500">3</span>
                         </label>
                         <label class="flex justify-between items-center cursor-pointer group">
                             <div class="flex items-center gap-3">
-                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="실험조리" data-cred="2">
-                                <span class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">실험조리</span>
+                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="실험조리"
+                                    data-cred="2">
+                                <span
+                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">실험조리</span>
                             </div>
                             <span class="text-sm font-mono text-gray-500">2</span>
                         </label>
                     </div>
                     <div class="px-5 py-3 border-t border-[#e5e5e5] text-right bg-gray-50/50 rounded-b-lg mt-auto">
-                        <span class="text-sm font-medium text-gray-600"><span class="card-sub-val font-bold text-gray-900">0</span>과목 · <span class="card-cred-val font-bold text-gray-900">0</span>학점</span>
+                        <span class="text-sm font-medium text-gray-600"><span
+                                class="card-sub-val font-bold text-gray-900">0</span>과목 · <span
+                                class="card-cred-val font-bold text-gray-900">0</span>학점</span>
                     </div>
                 </div>
 
                 <!-- Card 4: 급식 및 위생 -->
-                <div class="bg-white border border-[#e5e5e5] rounded-lg flex flex-col category-card" data-cat="급식 및 위생" data-min-sub="4" data-min-cred="11">
+                <div class="bg-white border border-[#e5e5e5] rounded-lg flex flex-col category-card" data-cat="급식 및 위생"
+                    data-min-sub="4" data-min-cred="11">
                     <div class="px-5 py-4 border-b border-[#e5e5e5] flex justify-between items-baseline">
                         <h3 class="text-lg font-bold tracking-tight">급식 및 위생</h3>
                         <span class="text-xs font-medium text-gray-500">최소 4과목 · 11학점</span>
@@ -332,47 +396,60 @@
                     <div class="p-5 flex-grow space-y-3">
                         <label class="flex justify-between items-center cursor-pointer group">
                             <div class="flex items-center gap-3">
-                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="단체급식관리" data-cred="3">
-                                <span class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">단체급식및실습</span>
+                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="단체급식관리"
+                                    data-cred="3">
+                                <span
+                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">단체급식및실습</span>
                             </div>
                             <span class="text-sm font-mono text-gray-500">3</span>
                         </label>
                         <label class="flex justify-between items-center cursor-pointer group">
                             <div class="flex items-center gap-3">
-                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="급식경영학" data-cred="3">
-                                <span class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">급식경영학</span>
+                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="급식경영학"
+                                    data-cred="3">
+                                <span
+                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">급식경영학</span>
                             </div>
                             <span class="text-sm font-mono text-gray-500">3</span>
                         </label>
                         <label class="flex justify-between items-center cursor-pointer group">
                             <div class="flex items-center gap-3">
-                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="식생활관리" data-cred="2">
-                                <span class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">식생활관리</span>
+                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="식생활관리"
+                                    data-cred="2">
+                                <span
+                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">식생활관리</span>
                             </div>
                             <span class="text-sm font-mono text-gray-500">2</span>
                         </label>
                         <label class="flex justify-between items-center cursor-pointer group">
                             <div class="flex items-center gap-3">
-                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="식품위생학" data-cred="3">
-                                <span class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">식품위생학</span>
+                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="식품위생학"
+                                    data-cred="3">
+                                <span
+                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">식품위생학</span>
                             </div>
                             <span class="text-sm font-mono text-gray-500">3</span>
                         </label>
                         <label class="flex justify-between items-center cursor-pointer group">
                             <div class="flex items-center gap-3">
-                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="식품위생관계법규" data-cred="3">
-                                <span class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">식품위생법규</span>
+                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="식품위생관계법규"
+                                    data-cred="3">
+                                <span
+                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">식품위생법규</span>
                             </div>
                             <span class="text-sm font-mono text-gray-500">3</span>
                         </label>
                     </div>
                     <div class="px-5 py-3 border-t border-[#e5e5e5] text-right bg-gray-50/50 rounded-b-lg mt-auto">
-                        <span class="text-sm font-medium text-gray-600"><span class="card-sub-val font-bold text-gray-900">0</span>과목 · <span class="card-cred-val font-bold text-gray-900">0</span>학점</span>
+                        <span class="text-sm font-medium text-gray-600"><span
+                                class="card-sub-val font-bold text-gray-900">0</span>과목 · <span
+                                class="card-cred-val font-bold text-gray-900">0</span>학점</span>
                     </div>
                 </div>
 
                 <!-- Card 5: 실습 -->
-                <div class="bg-white border border-[#e5e5e5] rounded-lg flex flex-col category-card" data-cat="실습" data-min-sub="1" data-min-cred="2">
+                <div class="bg-white border border-[#e5e5e5] rounded-lg flex flex-col category-card" data-cat="실습"
+                    data-min-sub="1" data-min-cred="2">
                     <div class="px-5 py-4 border-b border-[#e5e5e5] flex justify-between items-baseline">
                         <h3 class="text-lg font-bold tracking-tight">실습</h3>
                         <span class="text-xs font-medium text-gray-500">최소 1과목 · 2학점</span>
@@ -380,14 +457,18 @@
                     <div class="p-5 flex-grow space-y-3">
                         <label class="flex justify-between items-center cursor-pointer group">
                             <div class="flex items-center gap-3">
-                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="영양사현장실습" data-cred="2">
-                                <span class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">영양사현장실습</span>
+                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="영양사현장실습"
+                                    data-cred="2">
+                                <span
+                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">영양사현장실습</span>
                             </div>
                             <span class="text-sm font-mono text-gray-500">2</span>
                         </label>
                     </div>
                     <div class="px-5 py-3 border-t border-[#e5e5e5] text-right bg-gray-50/50 rounded-b-lg mt-auto">
-                        <span class="text-sm font-medium text-gray-600"><span class="card-sub-val font-bold text-gray-900">0</span>과목 · <span class="card-cred-val font-bold text-gray-900">0</span>학점</span>
+                        <span class="text-sm font-medium text-gray-600"><span
+                                class="card-sub-val font-bold text-gray-900">0</span>과목 · <span
+                                class="card-cred-val font-bold text-gray-900">0</span>학점</span>
                     </div>
                 </div>
 
@@ -396,7 +477,8 @@
 
         <!-- Footer -->
         <footer class="px-5 sm:px-8 py-5 border-t border-[#e5e5e5] bg-white mt-auto">
-            <p class="text-xs text-gray-400 font-medium leading-relaxed">참고용이며 최종 응시자격은 국시원 및 학과 확인. 과목수는 국시원 법정과목 기준으로, 기초영양학(1)·(2)와 식사요법(1)·(2)및실습은 각각 1과목으로 계산됩니다.</p>
+            <p class="text-xs text-gray-400 font-medium leading-relaxed">참고용이며 최종 응시자격은 국시원 및 학과 확인. 과목수는 국시원 법정과목 기준으로,
+                기초영양학(1)·(2)와 식사요법(1)·(2)및실습은 각각 1과목으로 계산됩니다.</p>
         </footer>
 
     </main>
@@ -441,8 +523,8 @@
                 animateValue(statTotalAreas, oldState.fulfilledAreas, newState.fulfilledAreas, 300);
 
                 const isFullyMet = newState.totalSub >= REQ_TOTAL_SUB &&
-                                   newState.totalCred >= REQ_TOTAL_CRED &&
-                                   newState.fulfilledAreas >= REQ_TOTAL_AREAS;
+                    newState.totalCred >= REQ_TOTAL_CRED &&
+                    newState.fulfilledAreas >= REQ_TOTAL_AREAS;
 
                 if (isFullyMet) {
                     mainStatus.textContent = '응시조건 충족';
@@ -530,4 +612,5 @@
         });
     </script>
 </body>
+
 </html>

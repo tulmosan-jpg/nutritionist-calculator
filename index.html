@@ -11,7 +11,6 @@
     <style>
         :root {
             --swiss-blue: #1b5cff;
-            --swiss-blue-hover: #1042c5;
             --border-light: #e5e5e5;
             --text-dark: #111111;
         }
@@ -23,7 +22,6 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Custom Checkbox for Swiss Style */
         .swiss-checkbox {
             appearance: none;
             background-color: #fff;
@@ -38,6 +36,7 @@
             place-content: center;
             cursor: pointer;
             transition: all 0.15s ease-in-out;
+            flex: none;
         }
 
         .swiss-checkbox::before {
@@ -66,7 +65,6 @@
             outline-offset: max(2px, 0.15em);
         }
 
-        /* Number transition utility */
         .number-transition {
             transition: color 0.3s ease;
         }
@@ -76,540 +74,292 @@
         }
 
         @keyframes pop {
-            0% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(1.1);
-            }
-
-            100% {
-                transform: scale(1);
-            }
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
 
-        /* Scrollbar styling for a cleaner look */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #d1d5db;
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #9ca3af;
-        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
     </style>
 </head>
 
 <body class="min-h-screen p-3 sm:p-6 lg:p-12 flex flex-col items-center">
 
-    <!-- Main Dashboard Container -->
-    <main
-        class="w-full max-w-[1500px] bg-white border border-[#e5e5e5] shadow-sm rounded-xl overflow-hidden flex flex-col">
+    <main class="w-full max-w-[1500px] bg-white border border-[#e5e5e5] shadow-sm rounded-xl overflow-hidden flex flex-col">
 
         <!-- Header -->
         <header class="px-5 sm:px-8 pt-6 sm:pt-8 pb-4 border-b border-[#e5e5e5]">
             <div class="flex flex-row justify-between items-start gap-3">
                 <div>
                     <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900">영양사 이수기준 계산기</h1>
-                    <p class="text-[13px] sm:text-sm text-gray-500 mt-1.5 sm:mt-2 font-medium tracking-tight">유한대학교
-                        식품영양학과</p>
+                    <p class="text-[13px] sm:text-sm text-gray-500 mt-1.5 sm:mt-2 font-medium tracking-tight">유한대학교 식품영양학과</p>
                 </div>
                 <button id="reset-btn"
                     class="shrink-0 text-[13px] sm:text-sm font-semibold text-gray-600 hover:text-black transition-colors px-3 py-1.5 rounded-md hover:bg-gray-100 border border-gray-200">
                     초기화
                 </button>
             </div>
+
+            <!-- Year selector -->
+            <div class="mt-5 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                <span class="text-xs font-bold text-gray-500 tracking-tight">입학 학년(교육과정)</span>
+                <div id="year-tabs" class="inline-flex bg-gray-100 rounded-lg p-1 gap-1 w-full sm:w-auto">
+                    <button data-year="2026" class="year-tab flex-1 sm:flex-none px-4 py-2 rounded-md text-[13px] sm:text-sm font-semibold transition-colors">1학년<span class="opacity-60 font-medium"> · 2026</span></button>
+                    <button data-year="2025" class="year-tab flex-1 sm:flex-none px-4 py-2 rounded-md text-[13px] sm:text-sm font-semibold transition-colors">2학년<span class="opacity-60 font-medium"> · 2025</span></button>
+                    <button data-year="2024" class="year-tab flex-1 sm:flex-none px-4 py-2 rounded-md text-[13px] sm:text-sm font-semibold transition-colors">3학년<span class="opacity-60 font-medium"> · 2024</span></button>
+                </div>
+            </div>
         </header>
 
-        <!-- KPI Summary Section -->
+        <!-- KPI Summary -->
         <section class="px-5 sm:px-8 pt-6 sm:pt-8 pb-6 relative">
-            <!-- Status -->
             <div class="pb-5 sm:pb-2">
-                <h2 id="main-status"
-                    class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tighter text-[#1b5cff] transition-colors duration-300">
-                    응시조건 충족
-                </h2>
+                <h2 id="main-status" class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tighter text-gray-400 transition-colors duration-300">조건 미충족</h2>
             </div>
-
-            <!-- Stats -->
             <div class="grid grid-cols-3 gap-3 sm:gap-10 lg:gap-16 sm:flex sm:justify-start">
                 <div class="flex flex-col items-start">
                     <span class="text-xs sm:text-sm font-bold text-gray-900 mb-0.5 sm:mb-1 tracking-tight">총 과목</span>
                     <div class="flex items-baseline gap-0.5 sm:gap-1">
-                        <span id="stat-total-sub"
-                            class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tighter number-transition">0</span>
+                        <span id="stat-total-sub" class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tighter number-transition">0</span>
                         <span class="text-lg sm:text-2xl lg:text-3xl font-medium text-gray-400">/18</span>
                     </div>
                 </div>
                 <div class="flex flex-col items-start">
                     <span class="text-xs sm:text-sm font-bold text-gray-900 mb-0.5 sm:mb-1 tracking-tight">총 학점</span>
                     <div class="flex items-baseline gap-0.5 sm:gap-1">
-                        <span id="stat-total-cred"
-                            class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tighter number-transition">0</span>
+                        <span id="stat-total-cred" class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tighter number-transition">0</span>
                         <span class="text-lg sm:text-2xl lg:text-3xl font-medium text-gray-400">/52</span>
                     </div>
                 </div>
                 <div class="flex flex-col items-start">
                     <span class="text-xs sm:text-sm font-bold text-gray-900 mb-0.5 sm:mb-1 tracking-tight">충족 영역</span>
                     <div class="flex items-baseline gap-0.5 sm:gap-1">
-                        <span id="stat-total-areas"
-                            class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tighter number-transition">0</span>
+                        <span id="stat-total-areas" class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tighter number-transition">0</span>
                         <span class="text-lg sm:text-2xl lg:text-3xl font-medium text-gray-400">/5</span>
                     </div>
                 </div>
             </div>
-
-            <!-- Progress Bar -->
             <div class="w-full h-1.5 bg-gray-100 mt-6 sm:mt-8 rounded-full overflow-hidden">
                 <div id="main-progress" class="h-full bg-[#1b5cff] w-0 transition-all duration-700 ease-out"></div>
             </div>
         </section>
 
-        <!-- Grid Section -->
+        <!-- Cards (rendered by JS) -->
         <section class="p-4 sm:p-8 bg-gray-50/30 flex-grow">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 h-full">
-
-                <!-- Card 1: 기초 -->
-                <div class="bg-white border border-[#e5e5e5] rounded-lg flex flex-col category-card" data-cat="기초"
-                    data-min-sub="2" data-min-cred="6">
-                    <div class="px-5 py-4 border-b border-[#e5e5e5] flex justify-between items-baseline">
-                        <h3 class="text-lg font-bold tracking-tight">기초</h3>
-                        <span class="text-xs font-medium text-gray-500">최소 2과목 · 6학점</span>
-                    </div>
-                    <div class="p-5 flex-grow space-y-3">
-                        <label class="flex justify-between items-center cursor-pointer group">
-                            <div class="flex items-center gap-3">
-                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="생리학" data-cred="3">
-                                <span
-                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">생리학</span>
-                            </div>
-                            <span class="text-sm font-mono text-gray-500">3</span>
-                        </label>
-                        <label class="flex justify-between items-center cursor-pointer group">
-                            <div class="flex items-center gap-3">
-                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="생화학" data-cred="3">
-                                <span
-                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">생화학</span>
-                            </div>
-                            <span class="text-sm font-mono text-gray-500">3</span>
-                        </label>
-                        <label class="flex justify-between items-center cursor-pointer group">
-                            <div class="flex items-center gap-3">
-                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="공중보건학"
-                                    data-cred="2">
-                                <span
-                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">공중보건학</span>
-                            </div>
-                            <span class="text-sm font-mono text-gray-500">2</span>
-                        </label>
-                    </div>
-                    <div class="px-5 py-3 border-t border-[#e5e5e5] text-right bg-gray-50/50 rounded-b-lg mt-auto">
-                        <span class="text-sm font-medium text-gray-600"><span
-                                class="card-sub-val font-bold text-gray-900">0</span>과목 · <span
-                                class="card-cred-val font-bold text-gray-900">0</span>학점</span>
-                    </div>
-                </div>
-
-                <!-- Card 2: 영양 -->
-                <div class="bg-white border border-[#e5e5e5] rounded-lg flex flex-col category-card" data-cat="영양"
-                    data-min-sub="6" data-min-cred="19">
-                    <div class="px-5 py-4 border-b border-[#e5e5e5] flex justify-between items-baseline">
-                        <h3 class="text-lg font-bold tracking-tight">영양</h3>
-                        <span class="text-xs font-medium text-gray-500">최소 6과목 · 19학점</span>
-                    </div>
-                    <div class="p-5 flex-grow space-y-3">
-                        <label class="flex justify-between items-center cursor-pointer group">
-                            <div class="flex items-center gap-3">
-                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="기초영양학"
-                                    data-cred="3">
-                                <span
-                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">기초영양학(1)</span>
-                            </div>
-                            <span class="text-sm font-mono text-gray-500">3</span>
-                        </label>
-                        <label class="flex justify-between items-center cursor-pointer group">
-                            <div class="flex items-center gap-3">
-                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="기초영양학"
-                                    data-cred="2">
-                                <span
-                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">기초영양학(2)</span>
-                            </div>
-                            <span class="text-sm font-mono text-gray-500">2</span>
-                        </label>
-                        <label class="flex justify-between items-center cursor-pointer group">
-                            <div class="flex items-center gap-3">
-                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="고급영양학"
-                                    data-cred="3">
-                                <span
-                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">고급영양학</span>
-                            </div>
-                            <span class="text-sm font-mono text-gray-500">3</span>
-                        </label>
-                        <label class="flex justify-between items-center cursor-pointer group">
-                            <div class="flex items-center gap-3">
-                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="생애주기영양학"
-                                    data-cred="3">
-                                <span
-                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">생애주기영양학</span>
-                            </div>
-                            <span class="text-sm font-mono text-gray-500">3</span>
-                        </label>
-                        <label class="flex justify-between items-center cursor-pointer group">
-                            <div class="flex items-center gap-3">
-                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="식사요법"
-                                    data-cred="3">
-                                <span
-                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">식사요법(1)</span>
-                            </div>
-                            <span class="text-sm font-mono text-gray-500">3</span>
-                        </label>
-                        <label class="flex justify-between items-center cursor-pointer group">
-                            <div class="flex items-center gap-3">
-                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="식사요법"
-                                    data-cred="3">
-                                <span
-                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">식사요법(2)및실습</span>
-                            </div>
-                            <span class="text-sm font-mono text-gray-500">3</span>
-                        </label>
-                        <label class="flex justify-between items-center cursor-pointer group">
-                            <div class="flex items-center gap-3">
-                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="영양교육"
-                                    data-cred="3">
-                                <span
-                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">영양교육</span>
-                            </div>
-                            <span class="text-sm font-mono text-gray-500">3</span>
-                        </label>
-                        <label class="flex justify-between items-center cursor-pointer group">
-                            <div class="flex items-center gap-3">
-                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="지역사회영양학"
-                                    data-cred="3">
-                                <span
-                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">지역사회영양학</span>
-                            </div>
-                            <span class="text-sm font-mono text-gray-500">3</span>
-                        </label>
-                        <label class="flex justify-between items-center cursor-pointer group">
-                            <div class="flex items-center gap-3">
-                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="영양판정"
-                                    data-cred="3">
-                                <span
-                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">영양판정</span>
-                            </div>
-                            <span class="text-sm font-mono text-gray-500">3</span>
-                        </label>
-                    </div>
-                    <div class="px-5 py-3 border-t border-[#e5e5e5] text-right bg-gray-50/50 rounded-b-lg mt-auto">
-                        <span class="text-sm font-medium text-gray-600"><span
-                                class="card-sub-val font-bold text-gray-900">0</span>과목 · <span
-                                class="card-cred-val font-bold text-gray-900">0</span>학점</span>
-                    </div>
-                </div>
-
-                <!-- Card 3: 식품 및 조리 -->
-                <div class="bg-white border border-[#e5e5e5] rounded-lg flex flex-col category-card" data-cat="식품 및 조리"
-                    data-min-sub="5" data-min-cred="14">
-                    <div class="px-5 py-4 border-b border-[#e5e5e5] flex justify-between items-baseline">
-                        <h3 class="text-lg font-bold tracking-tight">식품 및 조리</h3>
-                        <span class="text-xs font-medium text-gray-500">최소 5과목 · 14학점</span>
-                    </div>
-                    <div class="p-5 flex-grow space-y-3">
-                        <label class="flex justify-between items-center cursor-pointer group">
-                            <div class="flex items-center gap-3">
-                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="식품학" data-cred="3">
-                                <span
-                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">식품학</span>
-                            </div>
-                            <span class="text-sm font-mono text-gray-500">3</span>
-                        </label>
-                        <label class="flex justify-between items-center cursor-pointer group">
-                            <div class="flex items-center gap-3">
-                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="식품화학"
-                                    data-cred="3">
-                                <span
-                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">고급식품학</span>
-                            </div>
-                            <span class="text-sm font-mono text-gray-500">3</span>
-                        </label>
-                        <label class="flex justify-between items-center cursor-pointer group">
-                            <div class="flex items-center gap-3">
-                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="식품미생물학"
-                                    data-cred="3">
-                                <span
-                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">식품미생물학</span>
-                            </div>
-                            <span class="text-sm font-mono text-gray-500">3</span>
-                        </label>
-                        <label class="flex justify-between items-center cursor-pointer group">
-                            <div class="flex items-center gap-3">
-                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="식품가공및저장학"
-                                    data-cred="3">
-                                <span
-                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">식품가공학및실습</span>
-                            </div>
-                            <span class="text-sm font-mono text-gray-500">3</span>
-                        </label>
-                        <label class="flex justify-between items-center cursor-pointer group">
-                            <div class="flex items-center gap-3">
-                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="조리원리"
-                                    data-cred="3">
-                                <span
-                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">조리원리</span>
-                            </div>
-                            <span class="text-sm font-mono text-gray-500">3</span>
-                        </label>
-                        <label class="flex justify-between items-center cursor-pointer group">
-                            <div class="flex items-center gap-3">
-                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="실험조리"
-                                    data-cred="2">
-                                <span
-                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">실험조리</span>
-                            </div>
-                            <span class="text-sm font-mono text-gray-500">2</span>
-                        </label>
-                    </div>
-                    <div class="px-5 py-3 border-t border-[#e5e5e5] text-right bg-gray-50/50 rounded-b-lg mt-auto">
-                        <span class="text-sm font-medium text-gray-600"><span
-                                class="card-sub-val font-bold text-gray-900">0</span>과목 · <span
-                                class="card-cred-val font-bold text-gray-900">0</span>학점</span>
-                    </div>
-                </div>
-
-                <!-- Card 4: 급식 및 위생 -->
-                <div class="bg-white border border-[#e5e5e5] rounded-lg flex flex-col category-card" data-cat="급식 및 위생"
-                    data-min-sub="4" data-min-cred="11">
-                    <div class="px-5 py-4 border-b border-[#e5e5e5] flex justify-between items-baseline">
-                        <h3 class="text-lg font-bold tracking-tight">급식 및 위생</h3>
-                        <span class="text-xs font-medium text-gray-500">최소 4과목 · 11학점</span>
-                    </div>
-                    <div class="p-5 flex-grow space-y-3">
-                        <label class="flex justify-between items-center cursor-pointer group">
-                            <div class="flex items-center gap-3">
-                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="단체급식관리"
-                                    data-cred="3">
-                                <span
-                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">단체급식및실습</span>
-                            </div>
-                            <span class="text-sm font-mono text-gray-500">3</span>
-                        </label>
-                        <label class="flex justify-between items-center cursor-pointer group">
-                            <div class="flex items-center gap-3">
-                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="급식경영학"
-                                    data-cred="3">
-                                <span
-                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">급식경영학</span>
-                            </div>
-                            <span class="text-sm font-mono text-gray-500">3</span>
-                        </label>
-                        <label class="flex justify-between items-center cursor-pointer group">
-                            <div class="flex items-center gap-3">
-                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="식생활관리"
-                                    data-cred="2">
-                                <span
-                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">식생활관리</span>
-                            </div>
-                            <span class="text-sm font-mono text-gray-500">2</span>
-                        </label>
-                        <label class="flex justify-between items-center cursor-pointer group">
-                            <div class="flex items-center gap-3">
-                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="식품위생학"
-                                    data-cred="3">
-                                <span
-                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">식품위생학</span>
-                            </div>
-                            <span class="text-sm font-mono text-gray-500">3</span>
-                        </label>
-                        <label class="flex justify-between items-center cursor-pointer group">
-                            <div class="flex items-center gap-3">
-                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="식품위생관계법규"
-                                    data-cred="3">
-                                <span
-                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">식품위생법규</span>
-                            </div>
-                            <span class="text-sm font-mono text-gray-500">3</span>
-                        </label>
-                    </div>
-                    <div class="px-5 py-3 border-t border-[#e5e5e5] text-right bg-gray-50/50 rounded-b-lg mt-auto">
-                        <span class="text-sm font-medium text-gray-600"><span
-                                class="card-sub-val font-bold text-gray-900">0</span>과목 · <span
-                                class="card-cred-val font-bold text-gray-900">0</span>학점</span>
-                    </div>
-                </div>
-
-                <!-- Card 5: 실습 -->
-                <div class="bg-white border border-[#e5e5e5] rounded-lg flex flex-col category-card" data-cat="실습"
-                    data-min-sub="1" data-min-cred="2">
-                    <div class="px-5 py-4 border-b border-[#e5e5e5] flex justify-between items-baseline">
-                        <h3 class="text-lg font-bold tracking-tight">실습</h3>
-                        <span class="text-xs font-medium text-gray-500">최소 1과목 · 2학점</span>
-                    </div>
-                    <div class="p-5 flex-grow space-y-3">
-                        <label class="flex justify-between items-center cursor-pointer group">
-                            <div class="flex items-center gap-3">
-                                <input type="checkbox" class="swiss-checkbox subject-cb" data-group="영양사현장실습"
-                                    data-cred="2">
-                                <span
-                                    class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">영양사현장실습</span>
-                            </div>
-                            <span class="text-sm font-mono text-gray-500">2</span>
-                        </label>
-                    </div>
-                    <div class="px-5 py-3 border-t border-[#e5e5e5] text-right bg-gray-50/50 rounded-b-lg mt-auto">
-                        <span class="text-sm font-medium text-gray-600"><span
-                                class="card-sub-val font-bold text-gray-900">0</span>과목 · <span
-                                class="card-cred-val font-bold text-gray-900">0</span>학점</span>
-                    </div>
-                </div>
-
-            </div>
+            <div id="cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 h-full"></div>
         </section>
 
         <!-- Footer -->
         <footer class="px-5 sm:px-8 py-5 border-t border-[#e5e5e5] bg-white mt-auto">
-            <p class="text-xs text-gray-400 font-medium leading-relaxed">참고용이며 최종 응시자격은 국시원 및 학과 확인. 과목수는 국시원 법정과목 기준으로,
-                기초영양학(1)·(2)와 식사요법(1)·(2)및실습은 각각 1과목으로 계산됩니다.</p>
+            <p class="text-xs text-gray-400 font-medium leading-relaxed">
+                참고용이며 최종 응시자격은 국시원 및 학과 확인. 과목수는 국시원 법정과목 기준으로, 기초영양학(1)·(2)와 식사요법(1)·(2)및실습은 각각 1과목으로 계산됩니다.
+                영양사 이수 대상 과목·학점은 2024~2026 교육과정이 동일하며, 각 과목의 <b>개설 학기</b>만 학년별로 다릅니다.
+            </p>
         </footer>
-
     </main>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const checkboxes = document.querySelectorAll('.subject-cb');
-            const resetBtn = document.getElementById('reset-btn');
+        // ===== 데이터 =====
+        // 카테고리 최소 기준 (국시원 2010.5.23 이후 입학자용)
+        const CATEGORIES = [
+            { key: '기초',        min: { sub: 2, cred: 6 } },
+            { key: '영양',        min: { sub: 6, cred: 19 } },
+            { key: '식품 및 조리', min: { sub: 5, cred: 14 } },
+            { key: '급식 및 위생', min: { sub: 4, cred: 11 } },
+            { key: '실습',        min: { sub: 1, cred: 2 } },
+        ];
+        const REQ = { sub: 18, cred: 52, areas: 5 };
 
-            const mainStatus = document.getElementById('main-status');
-            const statTotalSub = document.getElementById('stat-total-sub');
-            const statTotalCred = document.getElementById('stat-total-cred');
-            const statTotalAreas = document.getElementById('stat-total-areas');
-            const progressBar = document.getElementById('main-progress');
+        // n:과목명, c:학점, g:법정과목(그룹), t:개설시기(학년-학기)
+        // 영양사 이수 대상 과목/학점은 3개 연도 동일. term(실험조리)만 2024가 다름.
+        function buildCourses(term_실험조리) {
+            return {
+                '기초': [
+                    { n: '생리학', c: 3, g: '생리학', t: '2-1' },
+                    { n: '생화학', c: 3, g: '생화학', t: '3-1' },
+                    { n: '공중보건학', c: 2, g: '공중보건학', t: '1-1' },
+                ],
+                '영양': [
+                    { n: '기초영양학(1)', c: 3, g: '기초영양학', t: '1-1' },
+                    { n: '기초영양학(2)', c: 2, g: '기초영양학', t: '1-2' },
+                    { n: '고급영양학', c: 3, g: '고급영양학', t: '2-1' },
+                    { n: '생애주기영양학', c: 3, g: '생애주기영양학', t: '3-2' },
+                    { n: '식사요법(1)', c: 3, g: '식사요법', t: '2-1' },
+                    { n: '식사요법(2)및실습', c: 3, g: '식사요법', t: '2-2' },
+                    { n: '영양교육', c: 3, g: '영양교육', t: '3-1' },
+                    { n: '지역사회영양학', c: 3, g: '지역사회영양학', t: '2-2' },
+                    { n: '영양판정', c: 3, g: '영양판정', t: '2-2' },
+                ],
+                '식품 및 조리': [
+                    { n: '식품학', c: 3, g: '식품학', t: '1-1' },
+                    { n: '고급식품학', c: 3, g: '식품화학', t: '3-1' },
+                    { n: '식품미생물학', c: 3, g: '식품미생물학', t: '2-1' },
+                    { n: '식품가공학및실습', c: 3, g: '식품가공및저장학', t: '3-2' },
+                    { n: '조리원리', c: 3, g: '조리원리', t: '1-2' },
+                    { n: '실험조리', c: 2, g: '실험조리', t: term_실험조리 },
+                ],
+                '급식 및 위생': [
+                    { n: '단체급식및실습', c: 3, g: '단체급식관리', t: '3-1' },
+                    { n: '급식경영학', c: 3, g: '급식경영학', t: '3-2' },
+                    { n: '식생활관리', c: 2, g: '식생활관리', t: '1-1' },
+                    { n: '식품위생학', c: 3, g: '식품위생학', t: '2-1' },
+                    { n: '식품위생법규', c: 2, g: '식품위생관계법규', t: '3-2' },
+                ],
+                '실습': [
+                    { n: '영양사현장실습', c: 2, g: '영양사현장실습', t: '3-1' },
+                ],
+            };
+        }
+        const CURRICULA = {
+            '2026': { grade: '1학년', courses: buildCourses('2-2') },
+            '2025': { grade: '2학년', courses: buildCourses('2-2') },
+            '2024': { grade: '3학년', courses: buildCourses('1-2') }, // 2024는 실험조리가 1학년 2학기
+        };
 
-            const REQ_TOTAL_SUB = 18;
-            const REQ_TOTAL_CRED = 52;
-            const REQ_TOTAL_AREAS = 5;
+        function termLabel(t) {
+            const [g, s] = t.split('-');
+            return `${g}-${s}`; // 예: 2-1 → 2학년 1학기 (툴팁), 화면엔 짧게 표기
+        }
+        function termFull(t) {
+            const [g, s] = t.split('-');
+            return `${g}학년 ${s}학기`;
+        }
 
-            function animateValue(element, start, end, duration) {
-                if (start === end) { element.textContent = end; return; }
-                let startTimestamp = null;
-                const step = (timestamp) => {
-                    if (!startTimestamp) startTimestamp = timestamp;
-                    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                    element.textContent = Math.floor(progress * (end - start) + start);
-                    if (progress < 1) {
-                        window.requestAnimationFrame(step);
-                    } else {
-                        element.textContent = end;
-                        element.classList.remove('pop-anim');
-                        void element.offsetWidth;
-                        element.classList.add('pop-anim');
-                    }
-                };
-                window.requestAnimationFrame(step);
-            }
+        // ===== 렌더링 =====
+        const cardsEl = document.getElementById('cards');
 
-            function updateUI(oldState, newState) {
-                animateValue(statTotalSub, oldState.totalSub, newState.totalSub, 300);
-                animateValue(statTotalCred, oldState.totalCred, newState.totalCred, 300);
-                animateValue(statTotalAreas, oldState.fulfilledAreas, newState.fulfilledAreas, 300);
+        function renderCards(year) {
+            const data = CURRICULA[year].courses;
+            cardsEl.innerHTML = CATEGORIES.map(cat => {
+                const list = data[cat.key];
+                const rows = list.map(co => `
+                    <label class="flex justify-between items-center cursor-pointer group gap-2">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <input type="checkbox" class="swiss-checkbox subject-cb" data-group="${co.g}" data-cred="${co.c}">
+                            <span class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors truncate">${co.n}</span>
+                        </div>
+                        <div class="flex items-center gap-2 shrink-0">
+                            <span class="text-[11px] font-medium text-gray-400 tabular-nums" title="개설: ${termFull(co.t)}">${termFull(co.t)}</span>
+                            <span class="text-sm font-mono text-gray-500">${co.c}</span>
+                        </div>
+                    </label>`).join('');
+                return `
+                <div class="bg-white border border-[#e5e5e5] rounded-lg flex flex-col category-card"
+                     data-cat="${cat.key}" data-min-sub="${cat.min.sub}" data-min-cred="${cat.min.cred}">
+                    <div class="px-5 py-4 border-b border-[#e5e5e5] flex justify-between items-baseline gap-2">
+                        <h3 class="text-lg font-bold tracking-tight">${cat.key}</h3>
+                        <span class="text-xs font-medium text-gray-500 shrink-0">최소 ${cat.min.sub}과목 · ${cat.min.cred}학점</span>
+                    </div>
+                    <div class="p-5 flex-grow space-y-3">${rows}</div>
+                    <div class="px-5 py-3 border-t border-[#e5e5e5] text-right bg-gray-50/50 rounded-b-lg mt-auto">
+                        <span class="text-sm font-medium text-gray-600"><span class="card-sub-val font-bold text-gray-900">0</span>과목 · <span class="card-cred-val font-bold text-gray-900">0</span>학점</span>
+                    </div>
+                </div>`;
+            }).join('');
 
-                const isFullyMet = newState.totalSub >= REQ_TOTAL_SUB &&
-                    newState.totalCred >= REQ_TOTAL_CRED &&
-                    newState.fulfilledAreas >= REQ_TOTAL_AREAS;
+            // 체크박스 이벤트 재바인딩
+            cardsEl.querySelectorAll('.subject-cb').forEach(cb => cb.addEventListener('change', calculate));
+        }
 
-                if (isFullyMet) {
-                    mainStatus.textContent = '응시조건 충족';
-                    mainStatus.classList.remove('text-gray-400');
-                    mainStatus.classList.add('text-[#1b5cff]');
-                    [statTotalSub, statTotalCred, statTotalAreas].forEach(el => {
-                        el.classList.remove('text-gray-400'); el.classList.add('text-black');
-                    });
-                    progressBar.style.width = '100%';
-                    progressBar.style.backgroundColor = 'var(--swiss-blue)';
-                } else {
-                    mainStatus.textContent = '조건 미충족';
-                    mainStatus.classList.remove('text-[#1b5cff]');
-                    mainStatus.classList.add('text-gray-400');
-                    [statTotalSub, statTotalCred, statTotalAreas].forEach(el => {
-                        el.classList.remove('text-black'); el.classList.add('text-gray-400');
-                    });
-                    const subProg = Math.min(newState.totalSub / REQ_TOTAL_SUB, 1);
-                    const credProg = Math.min(newState.totalCred / REQ_TOTAL_CRED, 1);
-                    const areaProg = Math.min(newState.fulfilledAreas / REQ_TOTAL_AREAS, 1);
-                    const avgProg = (subProg + credProg + areaProg) / 3 * 100;
-                    progressBar.style.width = `${avgProg}%`;
-                    progressBar.style.backgroundColor = '#9ca3af';
-                }
-            }
+        // ===== 계산 =====
+        const mainStatus = document.getElementById('main-status');
+        const statSub = document.getElementById('stat-total-sub');
+        const statCred = document.getElementById('stat-total-cred');
+        const statAreas = document.getElementById('stat-total-areas');
+        const progressBar = document.getElementById('main-progress');
 
-            let currentState = { totalSub: 0, totalCred: 0, fulfilledAreas: 0 };
+        function animateValue(el, start, end, dur) {
+            if (start === end) { el.textContent = end; return; }
+            let t0 = null;
+            const step = (ts) => {
+                if (!t0) t0 = ts;
+                const p = Math.min((ts - t0) / dur, 1);
+                el.textContent = Math.floor(p * (end - start) + start);
+                if (p < 1) requestAnimationFrame(step);
+                else { el.textContent = end; el.classList.remove('pop-anim'); void el.offsetWidth; el.classList.add('pop-anim'); }
+            };
+            requestAnimationFrame(step);
+        }
 
-            function calculate() {
-                const cards = document.querySelectorAll('.category-card');
-                let newTotalSub = 0;
-                let newTotalCred = 0;
-                let newFulfilledAreas = 0;
+        let state = { sub: 0, cred: 0, areas: 0 };
 
-                cards.forEach(card => {
-                    const minSub = parseInt(card.dataset.minSub);
-                    const minCred = parseInt(card.dataset.minCred);
-
-                    const cbs = card.querySelectorAll('.subject-cb');
-                    let checkedGroups = new Set();
-                    let catCred = 0;
-
-                    cbs.forEach(cb => {
-                        if (cb.checked) {
-                            checkedGroups.add(cb.dataset.group); // 기초영양학(1)/(2), 식사요법(1)/(2)를 1과목으로 합산
-                            catCred += parseInt(cb.dataset.cred);
-                        }
-                    });
-
-                    const catSubCount = checkedGroups.size;
-
-                    const subSpan = card.querySelector('.card-sub-val');
-                    const credSpan = card.querySelector('.card-cred-val');
-                    subSpan.textContent = catSubCount;
-                    credSpan.textContent = catCred;
-
-                    const isCatMet = (catSubCount >= minSub) && (catCred >= minCred);
-
-                    if (isCatMet) {
-                        newFulfilledAreas++;
-                        subSpan.className = 'card-sub-val font-bold text-[#1b5cff]';
-                        credSpan.className = 'card-cred-val font-bold text-[#1b5cff]';
-                    } else {
-                        subSpan.className = 'card-sub-val font-bold text-gray-400';
-                        credSpan.className = 'card-cred-val font-bold text-gray-400';
-                    }
-
-                    newTotalSub += catSubCount;
-                    newTotalCred += catCred;
+        function calculate() {
+            let totalSub = 0, totalCred = 0, areas = 0;
+            document.querySelectorAll('.category-card').forEach(card => {
+                const minSub = +card.dataset.minSub, minCred = +card.dataset.minCred;
+                const groups = new Set();
+                let cred = 0;
+                card.querySelectorAll('.subject-cb').forEach(cb => {
+                    if (cb.checked) { groups.add(cb.dataset.group); cred += +cb.dataset.cred; }
                 });
-
-                const newState = { totalSub: newTotalSub, totalCred: newTotalCred, fulfilledAreas: newFulfilledAreas };
-                updateUI(currentState, newState);
-                currentState = newState;
-            }
-
-            checkboxes.forEach(cb => cb.addEventListener('change', calculate));
-
-            resetBtn.addEventListener('click', () => {
-                checkboxes.forEach(cb => cb.checked = false);
-                calculate();
+                const subCount = groups.size;
+                const met = subCount >= minSub && cred >= minCred;
+                card.querySelector('.card-sub-val').textContent = subCount;
+                card.querySelector('.card-cred-val').textContent = cred;
+                const subSpan = card.querySelector('.card-sub-val');
+                const credSpan = card.querySelector('.card-cred-val');
+                const cls = met ? 'font-bold text-[#1b5cff]' : 'font-bold text-gray-400';
+                subSpan.className = 'card-sub-val ' + cls;
+                credSpan.className = 'card-cred-val ' + cls;
+                if (met) areas++;
+                totalSub += subCount; totalCred += cred;
             });
 
+            const ns = { sub: totalSub, cred: totalCred, areas };
+            animateValue(statSub, state.sub, ns.sub, 300);
+            animateValue(statCred, state.cred, ns.cred, 300);
+            animateValue(statAreas, state.areas, ns.areas, 300);
+
+            const ok = ns.sub >= REQ.sub && ns.cred >= REQ.cred && ns.areas >= REQ.areas;
+            if (ok) {
+                mainStatus.textContent = '응시조건 충족';
+                mainStatus.className = 'text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tighter text-[#1b5cff] transition-colors duration-300';
+                [statSub, statCred, statAreas].forEach(el => { el.classList.remove('text-gray-400'); el.classList.add('text-black'); });
+                progressBar.style.width = '100%';
+                progressBar.style.backgroundColor = 'var(--swiss-blue)';
+            } else {
+                mainStatus.textContent = '조건 미충족';
+                mainStatus.className = 'text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tighter text-gray-400 transition-colors duration-300';
+                [statSub, statCred, statAreas].forEach(el => { el.classList.remove('text-black'); el.classList.add('text-gray-400'); });
+                const avg = (Math.min(ns.sub / REQ.sub, 1) + Math.min(ns.cred / REQ.cred, 1) + Math.min(ns.areas / REQ.areas, 1)) / 3 * 100;
+                progressBar.style.width = avg + '%';
+                progressBar.style.backgroundColor = '#9ca3af';
+            }
+            state = ns;
+        }
+
+        // ===== 학년 탭 =====
+        let currentYear = '2026';
+        const yearTabs = document.querySelectorAll('.year-tab');
+        function setYearStyles() {
+            yearTabs.forEach(t => {
+                if (t.dataset.year === currentYear) {
+                    t.className = 'year-tab flex-1 sm:flex-none px-4 py-2 rounded-md text-[13px] sm:text-sm font-semibold transition-colors bg-[#1b5cff] text-white shadow-sm';
+                } else {
+                    t.className = 'year-tab flex-1 sm:flex-none px-4 py-2 rounded-md text-[13px] sm:text-sm font-semibold transition-colors text-gray-600 hover:text-black';
+                }
+            });
+        }
+        yearTabs.forEach(tab => tab.addEventListener('click', () => {
+            currentYear = tab.dataset.year;
+            setYearStyles();
+            state = { sub: 0, cred: 0, areas: 0 };
+            renderCards(currentYear);
+            calculate();
+        }));
+
+        document.getElementById('reset-btn').addEventListener('click', () => {
+            document.querySelectorAll('.subject-cb').forEach(cb => cb.checked = false);
             calculate();
         });
+
+        // 초기화
+        setYearStyles();
+        renderCards(currentYear);
+        calculate();
     </script>
 </body>
 

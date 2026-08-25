@@ -79,53 +79,30 @@
             100% { transform: scale(1); }
         }
 
-        /* KPI 요약: 스크롤해도 상단에 고정 */
-        #kpi {
-            position: sticky;
+        /* 상단 고정 요약 바.
+           position:fixed 라 문서 흐름 밖에 있고 높이도 항상 일정하다.
+           나타나거나 사라져도 본문 레이아웃이 전혀 바뀌지 않으므로
+           스크롤과 충돌하지 않는다. */
+        #sticky-bar {
+            position: fixed;
             top: 0;
-            z-index: 30;
+            left: 0;
+            right: 0;
+            z-index: 40;
             background-color: #fff;
-            border-bottom: 1px solid transparent;
-            /* 크기(padding/font-size)에는 transition을 걸지 않는다.
-               sticky 요소의 높이가 애니메이션되면 아래 콘텐츠가 200ms 동안 계속
-               밀려 화면이 떨린다. 레이아웃에 영향 없는 속성만 부드럽게 처리. */
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
-            /* KPI 크기 변화에 브라우저의 스크롤 앵커링이 반응해
-               스크롤 위치를 되돌리지 않도록 한다 */
-            overflow-anchor: none;
+            border-bottom: 1px solid var(--border-light);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transform: translateY(-100%);
+            transition: transform 0.2s ease;
+            will-change: transform;
         }
 
-        /* 관찰 대상이 높이 0이면 일부 모바일 브라우저에서 교차 판정이
-           불안정해 고정이 풀리지 않는다. 최소 1px을 준다. */
-        #kpi-sentinel {
-            height: 1px;
-            margin-bottom: -1px;
-        }
-
-        /* 고정된 상태에서는 목록을 가리지 않도록 높이를 줄인다 */
-        #kpi.is-stuck {
-            padding-top: 0.625rem;
-            padding-bottom: 0.625rem;
-            border-bottom-color: var(--border-light);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-        }
-
-        /* Tailwind 유틸리티보다 우선하도록 #id 선택자로 지정 */
-        #kpi.is-stuck .kpi-title-wrap { padding-bottom: 0.25rem; }
-        #kpi.is-stuck #main-status { font-size: 1.125rem; line-height: 1.4; }
-        #kpi.is-stuck .number-transition { font-size: 1.75rem; }
-        #kpi.is-stuck .kpi-denom { font-size: 0.875rem; }
-        #kpi.is-stuck .kpi-label { font-size: 0.6875rem; margin-bottom: 0; }
-        #kpi.is-stuck .kpi-bar { margin-top: 0.5rem; }
-
-        @media (min-width: 640px) {
-            #kpi.is-stuck #main-status { font-size: 1.5rem; }
-            #kpi.is-stuck .number-transition { font-size: 2.25rem; }
-            #kpi.is-stuck .kpi-denom { font-size: 1.125rem; }
+        #sticky-bar.is-visible {
+            transform: translateY(0);
         }
 
         @media (prefers-reduced-motion: reduce) {
-            #kpi, #kpi * { transition: none !important; }
+            #sticky-bar { transition: none; }
         }
 
         ::-webkit-scrollbar { width: 8px; height: 8px; }
@@ -137,9 +114,35 @@
 
 <body class="min-h-screen p-3 sm:p-6 lg:p-12 flex flex-col items-center">
 
-    <!-- overflow-hidden 은 KPI의 position:sticky 를 무력화하므로 사용하지 않고,
-         모서리 라운딩은 첫/마지막 자식에서 처리한다. -->
-    <main class="w-full max-w-[1500px] bg-white border border-[#e5e5e5] shadow-sm rounded-xl flex flex-col">
+    <!-- 스크롤을 내리면 나타나는 상단 요약 바 (본문 흐름 밖에 고정) -->
+    <div id="sticky-bar" aria-hidden="true">
+        <div class="max-w-[1500px] mx-auto px-4 sm:px-8 py-2.5 flex items-center justify-between gap-3">
+            <span id="bar-status" class="text-sm sm:text-base font-bold tracking-tight text-gray-400 shrink-0">조건 미충족</span>
+            <div class="flex items-baseline gap-3 sm:gap-8 shrink-0">
+                <div class="flex items-baseline gap-1">
+                    <span class="text-[11px] sm:text-xs font-bold text-gray-500">과목</span>
+                    <span id="bar-sub" class="text-lg sm:text-2xl font-bold tracking-tighter tabular-nums">0</span>
+                    <span class="text-[11px] sm:text-sm font-medium text-gray-400">/18</span>
+                </div>
+                <div class="flex items-baseline gap-1">
+                    <span class="text-[11px] sm:text-xs font-bold text-gray-500">학점</span>
+                    <span id="bar-cred" class="text-lg sm:text-2xl font-bold tracking-tighter tabular-nums">0</span>
+                    <span class="text-[11px] sm:text-sm font-medium text-gray-400">/52</span>
+                </div>
+                <div class="flex items-baseline gap-1">
+                    <span class="text-[11px] sm:text-xs font-bold text-gray-500">영역</span>
+                    <span id="bar-areas" class="text-lg sm:text-2xl font-bold tracking-tighter tabular-nums">0</span>
+                    <span class="text-[11px] sm:text-sm font-medium text-gray-400">/5</span>
+                </div>
+            </div>
+        </div>
+        <div class="h-1 bg-gray-100">
+            <div id="bar-progress" class="h-full bg-[#1b5cff] w-0 transition-all duration-500 ease-out"></div>
+        </div>
+    </div>
+
+
+    <main class="w-full max-w-[1500px] bg-white border border-[#e5e5e5] shadow-sm rounded-xl overflow-hidden flex flex-col">
 
         <!-- Header -->
         <header class="px-5 sm:px-8 pt-6 sm:pt-8 pb-4 border-b border-[#e5e5e5] rounded-t-xl bg-white">
@@ -165,38 +168,35 @@
             </div>
         </header>
 
-        <!-- 스크롤이 이 지점을 지나면 KPI 요약이 상단에 고정됨 -->
-        <div id="kpi-sentinel"></div>
-
-        <!-- KPI Summary (스크롤 시 상단 고정) -->
+        <!-- KPI Summary (화면 밖으로 나가면 상단 고정 바가 대신 표시됨) -->
         <section id="kpi" class="px-5 sm:px-8 pt-6 sm:pt-8 pb-6 relative">
-            <div class="kpi-title-wrap pb-5 sm:pb-2">
+            <div class="pb-5 sm:pb-2">
                 <h2 id="main-status" class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tighter text-gray-400 transition-colors duration-300">조건 미충족</h2>
             </div>
             <div class="grid grid-cols-3 gap-3 sm:gap-10 lg:gap-16 sm:flex sm:justify-start">
                 <div class="flex flex-col items-start">
-                    <span class="kpi-label text-xs sm:text-sm font-bold text-gray-900 mb-0.5 sm:mb-1 tracking-tight">총 과목</span>
+                    <span  class="text-xs sm:text-sm font-bold text-gray-900 mb-0.5 sm:mb-1 tracking-tight">총 과목</span>
                     <div class="flex items-baseline gap-0.5 sm:gap-1">
                         <span id="stat-total-sub" class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tighter number-transition">0</span>
-                        <span class="kpi-denom text-lg sm:text-2xl lg:text-3xl font-medium text-gray-400">/18</span>
+                        <span class="text-lg sm:text-2xl lg:text-3xl font-medium text-gray-400">/18</span>
                     </div>
                 </div>
                 <div class="flex flex-col items-start">
-                    <span class="kpi-label text-xs sm:text-sm font-bold text-gray-900 mb-0.5 sm:mb-1 tracking-tight">총 학점</span>
+                    <span  class="text-xs sm:text-sm font-bold text-gray-900 mb-0.5 sm:mb-1 tracking-tight">총 학점</span>
                     <div class="flex items-baseline gap-0.5 sm:gap-1">
                         <span id="stat-total-cred" class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tighter number-transition">0</span>
-                        <span class="kpi-denom text-lg sm:text-2xl lg:text-3xl font-medium text-gray-400">/52</span>
+                        <span class="text-lg sm:text-2xl lg:text-3xl font-medium text-gray-400">/52</span>
                     </div>
                 </div>
                 <div class="flex flex-col items-start">
-                    <span class="kpi-label text-xs sm:text-sm font-bold text-gray-900 mb-0.5 sm:mb-1 tracking-tight">충족 영역</span>
+                    <span  class="text-xs sm:text-sm font-bold text-gray-900 mb-0.5 sm:mb-1 tracking-tight">충족 영역</span>
                     <div class="flex items-baseline gap-0.5 sm:gap-1">
                         <span id="stat-total-areas" class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tighter number-transition">0</span>
-                        <span class="kpi-denom text-lg sm:text-2xl lg:text-3xl font-medium text-gray-400">/5</span>
+                        <span class="text-lg sm:text-2xl lg:text-3xl font-medium text-gray-400">/5</span>
                     </div>
                 </div>
             </div>
-            <div class="kpi-bar w-full h-1.5 bg-gray-100 mt-6 sm:mt-8 rounded-full overflow-hidden">
+            <div class="w-full h-1.5 bg-gray-100 mt-6 sm:mt-8 rounded-full overflow-hidden">
                 <div id="main-progress" class="h-full bg-[#1b5cff] w-0 transition-all duration-700 ease-out"></div>
             </div>
         </section>
@@ -464,6 +464,11 @@
         const statCred = document.getElementById('stat-total-cred');
         const statAreas = document.getElementById('stat-total-areas');
         const progressBar = document.getElementById('main-progress');
+        const barStatus = document.getElementById('bar-status');
+        const barSub = document.getElementById('bar-sub');
+        const barCred = document.getElementById('bar-cred');
+        const barAreas = document.getElementById('bar-areas');
+        const barProgress = document.getElementById('bar-progress');
 
         function animateValue(el, start, end, dur) {
             if (start === end) { el.textContent = end; return; }
@@ -544,6 +549,17 @@
                 progressBar.style.width = avg + '%';
                 progressBar.style.backgroundColor = '#9ca3af';
             }
+
+            // 상단 고정 바에도 같은 값을 반영
+            barSub.textContent = ns.sub;
+            barCred.textContent = ns.cred;
+            barAreas.textContent = ns.areas;
+            barStatus.textContent = ok ? '응시조건 충족' : '조건 미충족';
+            barStatus.className = 'text-sm sm:text-base font-bold tracking-tight shrink-0 '
+                + (ok ? 'text-[#1b5cff]' : 'text-gray-400');
+            barProgress.style.width = progressBar.style.width;
+            barProgress.style.backgroundColor = progressBar.style.backgroundColor;
+
             state = ns;
         }
 
@@ -573,65 +589,28 @@
             calculate();
         });
 
-        // ===== KPI 고정 시 축소 =====
-        // sentinel이 화면 밖으로 벗어나면 KPI가 상단에 붙은 상태로 보고 축소한다.
-        const kpiEl = document.getElementById('kpi');
-        const sentinel = document.getElementById('kpi-sentinel');
+        // ===== 상단 고정 요약 바 =====
+        // KPI 섹션이 화면 위로 사라지면 고정 바를 내려 보여준다.
+        // 바는 position:fixed 라 본문 레이아웃을 전혀 건드리지 않는다.
+        const bar = document.getElementById('sticky-bar');
 
-        // KPI는 흐름(flow) 안에 있는 sticky 요소라, 축소되면 그만큼 아래 콘텐츠가
-        // 위로 딸려 올라온다. 줄어든 높이를 margin-bottom으로 채워 넣어
-        // 차지하는 총 공간을 항상 일정하게 유지한다. → 아래 콘텐츠가 전혀 움직이지 않음.
-        let expandedH = 0;
-
-        function measureExpanded() {
-            const wasStuck = kpiEl.classList.contains('is-stuck');
-            const prevMargin = kpiEl.style.marginBottom;
-            kpiEl.classList.remove('is-stuck');
-            kpiEl.style.marginBottom = '';
-            expandedH = kpiEl.offsetHeight;
-            if (wasStuck) {
-                kpiEl.classList.add('is-stuck');
-                kpiEl.style.marginBottom = prevMargin;
-            }
+        function showBar(show) {
+            if (show === bar.classList.contains('is-visible')) return;
+            bar.classList.toggle('is-visible', show);
+            bar.setAttribute('aria-hidden', show ? 'false' : 'true');
         }
-
-        function applyStuck(stuck, force) {
-            if (!force && stuck === kpiEl.classList.contains('is-stuck')) return;
-            kpiEl.classList.toggle('is-stuck', stuck);
-            kpiEl.style.marginBottom = stuck
-                ? Math.max(0, expandedH - kpiEl.offsetHeight) + 'px'
-                : '';
-        }
-
-        measureExpanded();
 
         if ('IntersectionObserver' in window) {
             new IntersectionObserver(
-                ([e]) => applyStuck(!e.isIntersecting),
+                ([e]) => showBar(!e.isIntersecting),
                 { threshold: 0 }
-            ).observe(sentinel);
+            ).observe(document.getElementById('kpi'));
         } else {
-            // IntersectionObserver 미지원 시 스크롤 위치로 판정
+            const kpiEl = document.getElementById('kpi');
             addEventListener('scroll', () => {
-                applyStuck(sentinel.getBoundingClientRect().bottom <= 0);
+                showBar(kpiEl.getBoundingClientRect().bottom <= 0);
             }, { passive: true });
         }
-
-        // 모바일은 주소창이 접히고 펴질 때마다 resize가 발생한다. 그때마다 다시
-        // 재는 것은 스크롤 중 불필요한 레이아웃을 유발하므로, 가로폭이 실제로
-        // 바뀐 경우(회전/창 크기 변경)에만 재측정한다.
-        let lastWidth = window.innerWidth;
-        let resizeTimer;
-        window.addEventListener('resize', () => {
-            if (window.innerWidth === lastWidth) return;
-            lastWidth = window.innerWidth;
-            clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(() => {
-                const stuck = kpiEl.classList.contains('is-stuck');
-                measureExpanded();
-                applyStuck(stuck, true);
-            }, 150);
-        });
 
         // 초기화
         setYearStyles();

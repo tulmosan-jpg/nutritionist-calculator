@@ -86,7 +86,10 @@
             z-index: 30;
             background-color: #fff;
             border-bottom: 1px solid transparent;
-            transition: padding 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+            /* 크기(padding/font-size)에는 transition을 걸지 않는다.
+               sticky 요소의 높이가 애니메이션되면 아래 콘텐츠가 200ms 동안 계속
+               밀려 화면이 떨린다. 레이아웃에 영향 없는 속성만 부드럽게 처리. */
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
 
         /* 고정된 상태에서는 목록을 가리지 않도록 높이를 줄인다 */
@@ -95,15 +98,6 @@
             padding-bottom: 0.625rem;
             border-bottom-color: var(--border-light);
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-        }
-
-        #kpi .kpi-title-wrap,
-        #kpi #main-status,
-        #kpi .number-transition,
-        #kpi .kpi-denom,
-        #kpi .kpi-label,
-        #kpi .kpi-bar {
-            transition: font-size 0.2s ease, padding 0.2s ease, margin 0.2s ease;
         }
 
         /* Tailwind 유틸리티보다 우선하도록 #id 선택자로 지정 */
@@ -573,12 +567,45 @@
         // sentinel이 화면 밖으로 벗어나면 KPI가 상단에 붙은 상태로 보고 축소한다.
         const kpiEl = document.getElementById('kpi');
         const sentinel = document.getElementById('kpi-sentinel');
+
+        // KPI는 흐름(flow) 안에 있는 sticky 요소라, 축소되면 그만큼 아래 콘텐츠가
+        // 위로 딸려 올라온다. 줄어든 높이를 margin-bottom으로 채워 넣어
+        // 차지하는 총 공간을 항상 일정하게 유지한다. → 아래 콘텐츠가 전혀 움직이지 않음.
+        let expandedH = 0;
+
+        function measureExpanded() {
+            const wasStuck = kpiEl.classList.contains('is-stuck');
+            const prevMargin = kpiEl.style.marginBottom;
+            kpiEl.classList.remove('is-stuck');
+            kpiEl.style.marginBottom = '';
+            expandedH = kpiEl.offsetHeight;
+            if (wasStuck) {
+                kpiEl.classList.add('is-stuck');
+                kpiEl.style.marginBottom = prevMargin;
+            }
+        }
+
+        function applyStuck(stuck) {
+            kpiEl.classList.toggle('is-stuck', stuck);
+            kpiEl.style.marginBottom = stuck
+                ? Math.max(0, expandedH - kpiEl.offsetHeight) + 'px'
+                : '';
+        }
+
+        measureExpanded();
+
         if ('IntersectionObserver' in window) {
             new IntersectionObserver(
-                ([e]) => kpiEl.classList.toggle('is-stuck', !e.isIntersecting),
+                ([e]) => applyStuck(!e.isIntersecting),
                 { threshold: 0 }
             ).observe(sentinel);
         }
+
+        window.addEventListener('resize', () => {
+            const stuck = kpiEl.classList.contains('is-stuck');
+            measureExpanded();
+            applyStuck(stuck);
+        });
 
         // 초기화
         setYearStyles();

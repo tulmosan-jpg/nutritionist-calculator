@@ -148,8 +148,13 @@
         </section>
 
         <!-- Cards (rendered by JS) -->
-        <section class="p-4 sm:p-8 bg-gray-50/30 flex-grow">
+        <section class="p-4 sm:p-8 pb-0 sm:pb-0 bg-gray-50/30 flex-grow">
             <div id="cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 h-full"></div>
+        </section>
+
+        <!-- 기타 과목 (영양사 인정과목이 아닌 학과 교과목) -->
+        <section class="p-4 sm:p-8 bg-gray-50/30">
+            <div id="other-card" class="bg-white border border-[#e5e5e5] rounded-lg"></div>
         </section>
 
         <!-- Footer -->
@@ -158,7 +163,8 @@
                 참고용이며 최종 응시자격은 국시원 및 학과 확인. 과목수는 국시원 <b>법정과목</b> 기준으로, 기초영양학(1)·(2)와 식사요법(1)·(2)및실습은 각각 1과목으로 계산됩니다.
                 <b>법정과목 하나당 1과목만 인정</b>되므로, 같은 자리를 채우는 유사인정과목(공중보건학↔환경위생학및실습, 식품학↔식품재료학, 고급식품학↔식품분석실험,
                 조리원리↔서양조리실습↔한국조리실습(1), 식생활관리↔식생활과문화, 단체급식및실습↔외식산업론)을 함께 체크하면 학점이 큰 쪽만 인정되고
-                나머지는 <span class="text-amber-600 font-bold">중복</span>으로 표시됩니다.
+                나머지는 <span class="text-amber-600 font-bold">동일인정</span>으로 표시됩니다.
+                맨 아래 <b>기타 과목</b>은 영양사 이수기준 법정과목에 해당하지 않는 학과 교과목으로, 계산에 포함되지 않습니다.
                 영양사 이수 대상 과목·학점은 2024~2026 교육과정이 동일하며, <b>개설 학기</b>만 2024학번의 한국조리실습(1)·서양조리실습·외식산업론·실험조리가 다릅니다.
             </p>
         </footer>
@@ -247,10 +253,43 @@
                 ],
             };
         }
+        // 학과 교과목 중 영양사 이수기준 법정과목에 해당하지 않는 과목 (참고용, 계산 제외)
+        // 취창업멘토링은 학번별 학점이 달라 연도별로 지정.
+        const OTHER_BASE = [
+            { n: '취창업멘토링(1)', t: '1-1' }, { n: '취창업멘토링(2)', t: '1-2' },
+            { n: '취창업멘토링(3)', t: '2-1' }, { n: '취창업멘토링(4)', t: '2-2' },
+            { n: '취창업멘토링(5)', t: '3-1' }, { n: '취창업멘토링(6)', t: '3-2' },
+            { n: '식생활과건강', c: 1, t: '1-2' },
+            { n: 'HACCP실무', c: 3, t: '1-2' },
+            { n: '제과제빵실습', c: 3, t: '1-2' },
+            { n: '기능성식품학및실습', c: 3, t: '2-2' },
+            { n: '캡스톤디자인', c: 3, t: '3-1' },
+            { n: '영양사학습평가', c: 2, t: '3-2' },
+            { n: '메뉴및원가관리', c: 3, t: '3-2' },
+        ];
+        // 취창업멘토링(1)~(6) 학점 (교육과정표 기준)
+        const MENTORING_CREDITS = {
+            '2026': [1, 1, 1, 1, 1, 1],
+            '2025': [0.5, 0.5, 1, 1, 1, 1],
+            '2024': [0.5, 0.5, 0.5, 0.5, 1, 1],
+        };
+        const OTHER_TERMS_2024 = { '제과제빵실습': '1-1' };
+
+        function buildOther(year) {
+            const mc = MENTORING_CREDITS[year];
+            const override = year === '2024' ? OTHER_TERMS_2024 : {};
+            let i = 0;
+            return OTHER_BASE.map(o => ({
+                n: o.n,
+                c: o.c !== undefined ? o.c : mc[i++],
+                t: override[o.n] || o.t,
+            }));
+        }
+
         const CURRICULA = {
-            '2026': { grade: '1학년', courses: buildCourses({}) },
-            '2025': { grade: '2학년', courses: buildCourses({}) },
-            '2024': { grade: '3학년', courses: buildCourses(TERMS_2024) },
+            '2026': { grade: '1학년', courses: buildCourses({}), other: buildOther('2026') },
+            '2025': { grade: '2학년', courses: buildCourses({}), other: buildOther('2025') },
+            '2024': { grade: '3학년', courses: buildCourses(TERMS_2024), other: buildOther('2024') },
         };
 
         function termLabel(t) {
@@ -264,6 +303,26 @@
 
         // ===== 렌더링 =====
         const cardsEl = document.getElementById('cards');
+        const otherEl = document.getElementById('other-card');
+
+        function renderOther(year) {
+            const list = CURRICULA[year].other;
+            const total = list.reduce((s, o) => s + o.c, 0);
+            const rows = list.map(o => `
+                <div class="flex justify-between items-center gap-2 py-1">
+                    <span class="text-sm font-medium text-gray-500 truncate">${o.n}</span>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <span class="text-[11px] font-medium text-gray-400 tabular-nums">${termFull(o.t)}</span>
+                        <span class="text-sm font-mono text-gray-400">${o.c}</span>
+                    </div>
+                </div>`).join('');
+            otherEl.innerHTML = `
+                <div class="px-5 py-4 border-b border-[#e5e5e5] flex justify-between items-baseline gap-2 flex-wrap">
+                    <h3 class="text-lg font-bold tracking-tight text-gray-500">기타 과목</h3>
+                    <span class="text-xs font-medium text-gray-400">영양사 이수기준에 포함되지 않는 학과 교과목 · ${list.length}과목 ${total}학점</span>
+                </div>
+                <div class="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-1">${rows}</div>`;
+        }
 
         function renderCards(year) {
             const data = CURRICULA[year].courses;
@@ -275,7 +334,8 @@
                         <div class="flex items-center gap-3 min-w-0">
                             <input type="checkbox" class="swiss-checkbox subject-cb" data-group="${co.g}" data-alt="${co.a}" data-cred="${co.c}">
                             <span class="course-name text-sm font-medium text-gray-700 group-hover:text-black transition-colors truncate">${co.n}</span>
-                            <span class="dup-badge hidden text-[10px] font-bold text-amber-600 bg-amber-50 border border-amber-200 rounded px-1 py-px shrink-0">중복</span>
+                            <span class="dup-badge hidden text-[10px] font-bold text-amber-600 bg-amber-50 border border-amber-200 rounded px-1 py-px shrink-0"
+                                  title="같은 법정과목을 채우는 동일인정과목입니다. 법정과목당 1과목만 인정되어 이 과목은 학점에 반영되지 않습니다.">동일인정</span>
                         </div>
                         <div class="flex items-center gap-2 shrink-0">
                             <span class="text-[11px] font-medium text-gray-400 tabular-nums">${termFull(co.t)}</span>
@@ -406,6 +466,7 @@
             setYearStyles();
             state = { sub: 0, cred: 0, areas: 0 };
             renderCards(currentYear);
+            renderOther(currentYear);
             calculate();
         }));
 
@@ -417,6 +478,7 @@
         // 초기화
         setYearStyles();
         renderCards(currentYear);
+        renderOther(currentYear);
         calculate();
     </script>
 </body>

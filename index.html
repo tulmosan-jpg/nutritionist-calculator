@@ -155,8 +155,11 @@
         <!-- Footer -->
         <footer class="px-5 sm:px-8 py-5 border-t border-[#e5e5e5] bg-white mt-auto">
             <p class="text-xs text-gray-400 font-medium leading-relaxed">
-                참고용이며 최종 응시자격은 국시원 및 학과 확인. 과목수는 국시원 법정과목 기준으로, 기초영양학(1)·(2)와 식사요법(1)·(2)및실습은 각각 1과목으로 계산됩니다.
-                영양사 이수 대상 과목·학점은 2024~2026 교육과정이 동일하며, 각 과목의 <b>개설 학기</b>만 학년별로 다릅니다.
+                참고용이며 최종 응시자격은 국시원 및 학과 확인. 과목수는 국시원 <b>법정과목</b> 기준으로, 기초영양학(1)·(2)와 식사요법(1)·(2)및실습은 각각 1과목으로 계산됩니다.
+                <b>법정과목 하나당 1과목만 인정</b>되므로, 같은 자리를 채우는 유사인정과목(공중보건학↔환경위생학및실습, 식품학↔식품재료학, 고급식품학↔식품분석실험,
+                조리원리↔서양조리실습↔한국조리실습(1), 식생활관리↔식생활과문화, 단체급식및실습↔외식산업론)을 함께 체크하면 학점이 큰 쪽만 인정되고
+                나머지는 <span class="text-amber-600 font-bold">중복</span>으로 표시됩니다.
+                영양사 이수 대상 과목·학점은 2024~2026 교육과정이 동일하며, <b>개설 학기</b>만 2024학번의 한국조리실습(1)·서양조리실습·외식산업론·실험조리가 다릅니다.
             </p>
         </footer>
     </main>
@@ -173,50 +176,81 @@
         ];
         const REQ = { sub: 18, cred: 52, areas: 5 };
 
-        // n:과목명, c:학점, g:법정과목(그룹), t:개설시기(학년-학기)
-        // 영양사 이수 대상 과목/학점은 3개 연도 동일. term(실험조리)만 2024가 다름.
-        function buildCourses(term_실험조리) {
+        // 2025·2026년도 교육과정 기준 개설 학기 (학과 교육과정표)
+        const BASE_TERMS = {
+            '공중보건학': '1-1', '식생활과문화': '1-1', '식생활관리': '1-1',
+            '기초영양학(1)': '1-1', '식품학': '1-1', '서양조리실습': '1-1',
+            '기초영양학(2)': '1-2', '식품분석실험': '1-2', '조리원리': '1-2', '한국조리실습(1)': '1-2',
+            '식사요법(1)': '2-1', '식품미생물학': '2-1', '식품위생학': '2-1',
+            '고급영양학': '2-1', '생리학': '2-1', '식품재료학': '2-1',
+            '지역사회영양학': '2-2', '실험조리': '2-2', '식사요법(2)및실습': '2-2',
+            '영양판정': '2-2', '환경위생학및실습': '2-2',
+            '생화학': '3-1', '외식산업론': '3-1', '고급식품학': '3-1',
+            '단체급식및실습': '3-1', '영양교육': '3-1',
+            '식품위생법규': '3-2', '영양사현장실습': '3-2', '급식경영학': '3-2',
+            '생애주기영양학': '3-2', '식품가공학및실습': '3-2',
+        };
+
+        // 2024년도 교육과정에서만 개설 학기가 다른 과목
+        const TERMS_2024 = {
+            '한국조리실습(1)': '1-1',
+            '서양조리실습': '1-2', '외식산업론': '1-2', '실험조리': '1-2',
+        };
+
+        // n:과목명, c:학점, g:법정과목(그룹), a:인정옵션, t:개설시기(학년-학기)
+        // 같은 g + 같은 a = 한 과목의 분반((1)/(2)) → 학점 합산
+        // 같은 g + 다른 a = 서로 대체되는 유사인정과목 → 학점이 큰 하나만 인정
+        // 영양사 이수 대상 과목·학점은 3개 연도 동일하고, 2024학번만 일부 과목의 개설 학기가 다름.
+        function buildCourses(override) {
+            const c = (n, cred, g, a) => ({ n, c: cred, g, a, t: override[n] || BASE_TERMS[n] });
             return {
                 '기초': [
-                    { n: '생리학', c: 3, g: '생리학', t: '2-1' },
-                    { n: '생화학', c: 3, g: '생화학', t: '3-1' },
-                    { n: '공중보건학', c: 2, g: '공중보건학', t: '1-1' },
+                    c('생리학', 3, '생리학', 'A'),
+                    c('생화학', 3, '생화학', 'A'),
+                    c('공중보건학', 2, '공중보건학', 'A'),
+                    c('환경위생학및실습', 3, '공중보건학', 'B'),
                 ],
                 '영양': [
-                    { n: '기초영양학(1)', c: 3, g: '기초영양학', t: '1-1' },
-                    { n: '기초영양학(2)', c: 2, g: '기초영양학', t: '1-2' },
-                    { n: '고급영양학', c: 3, g: '고급영양학', t: '2-1' },
-                    { n: '생애주기영양학', c: 3, g: '생애주기영양학', t: '3-2' },
-                    { n: '식사요법(1)', c: 3, g: '식사요법', t: '2-1' },
-                    { n: '식사요법(2)및실습', c: 3, g: '식사요법', t: '2-2' },
-                    { n: '영양교육', c: 3, g: '영양교육', t: '3-1' },
-                    { n: '지역사회영양학', c: 3, g: '지역사회영양학', t: '2-2' },
-                    { n: '영양판정', c: 3, g: '영양판정', t: '2-2' },
+                    c('기초영양학(1)', 3, '기초영양학', 'A'),
+                    c('기초영양학(2)', 2, '기초영양학', 'A'),
+                    c('고급영양학', 3, '고급영양학', 'A'),
+                    c('생애주기영양학', 3, '생애주기영양학', 'A'),
+                    c('식사요법(1)', 3, '식사요법', 'A'),
+                    c('식사요법(2)및실습', 3, '식사요법', 'A'),
+                    c('영양교육', 3, '영양교육', 'A'),
+                    c('지역사회영양학', 3, '지역사회영양학', 'A'),
+                    c('영양판정', 3, '영양판정', 'A'),
                 ],
                 '식품 및 조리': [
-                    { n: '식품학', c: 3, g: '식품학', t: '1-1' },
-                    { n: '고급식품학', c: 3, g: '식품화학', t: '3-1' },
-                    { n: '식품미생물학', c: 3, g: '식품미생물학', t: '2-1' },
-                    { n: '식품가공학및실습', c: 3, g: '식품가공및저장학', t: '3-2' },
-                    { n: '조리원리', c: 3, g: '조리원리', t: '1-2' },
-                    { n: '실험조리', c: 2, g: '실험조리', t: term_실험조리 },
+                    c('식품학', 3, '식품학', 'A'),
+                    c('식품재료학', 3, '식품학', 'B'),
+                    c('고급식품학', 3, '식품화학', 'A'),
+                    c('식품분석실험', 3, '식품화학', 'B'),
+                    c('식품미생물학', 3, '식품미생물학', 'A'),
+                    c('식품가공학및실습', 3, '식품가공및저장학', 'A'),
+                    c('조리원리', 3, '조리원리', 'A'),
+                    c('서양조리실습', 3, '조리원리', 'B'),
+                    c('한국조리실습(1)', 3, '조리원리', 'C'),
+                    c('실험조리', 2, '실험조리', 'A'),
                 ],
                 '급식 및 위생': [
-                    { n: '단체급식및실습', c: 3, g: '단체급식관리', t: '3-1' },
-                    { n: '급식경영학', c: 3, g: '급식경영학', t: '3-2' },
-                    { n: '식생활관리', c: 2, g: '식생활관리', t: '1-1' },
-                    { n: '식품위생학', c: 3, g: '식품위생학', t: '2-1' },
-                    { n: '식품위생법규', c: 2, g: '식품위생관계법규', t: '3-2' },
+                    c('단체급식및실습', 3, '단체급식관리', 'A'),
+                    c('외식산업론', 2, '단체급식관리', 'B'),
+                    c('급식경영학', 3, '급식경영학', 'A'),
+                    c('식생활관리', 2, '식생활관리', 'A'),
+                    c('식생활과문화', 2, '식생활관리', 'B'),
+                    c('식품위생학', 3, '식품위생학', 'A'),
+                    c('식품위생법규', 2, '식품위생관계법규', 'A'),
                 ],
                 '실습': [
-                    { n: '영양사현장실습', c: 2, g: '영양사현장실습', t: '3-1' },
+                    c('영양사현장실습', 2, '영양사현장실습', 'A'),
                 ],
             };
         }
         const CURRICULA = {
-            '2026': { grade: '1학년', courses: buildCourses('2-2') },
-            '2025': { grade: '2학년', courses: buildCourses('2-2') },
-            '2024': { grade: '3학년', courses: buildCourses('1-2') }, // 2024는 실험조리가 1학년 2학기
+            '2026': { grade: '1학년', courses: buildCourses({}) },
+            '2025': { grade: '2학년', courses: buildCourses({}) },
+            '2024': { grade: '3학년', courses: buildCourses(TERMS_2024) },
         };
 
         function termLabel(t) {
@@ -236,14 +270,16 @@
             cardsEl.innerHTML = CATEGORIES.map(cat => {
                 const list = data[cat.key];
                 const rows = list.map(co => `
-                    <label class="flex justify-between items-center cursor-pointer group gap-2">
+                    <label class="course-row flex justify-between items-center cursor-pointer group gap-2"
+                           title="법정과목: ${co.g} · 개설: ${termFull(co.t)}">
                         <div class="flex items-center gap-3 min-w-0">
-                            <input type="checkbox" class="swiss-checkbox subject-cb" data-group="${co.g}" data-cred="${co.c}">
-                            <span class="text-sm font-medium text-gray-700 group-hover:text-black transition-colors truncate">${co.n}</span>
+                            <input type="checkbox" class="swiss-checkbox subject-cb" data-group="${co.g}" data-alt="${co.a}" data-cred="${co.c}">
+                            <span class="course-name text-sm font-medium text-gray-700 group-hover:text-black transition-colors truncate">${co.n}</span>
+                            <span class="dup-badge hidden text-[10px] font-bold text-amber-600 bg-amber-50 border border-amber-200 rounded px-1 py-px shrink-0">중복</span>
                         </div>
                         <div class="flex items-center gap-2 shrink-0">
-                            <span class="text-[11px] font-medium text-gray-400 tabular-nums" title="개설: ${termFull(co.t)}">${termFull(co.t)}</span>
-                            <span class="text-sm font-mono text-gray-500">${co.c}</span>
+                            <span class="text-[11px] font-medium text-gray-400 tabular-nums">${termFull(co.t)}</span>
+                            <span class="course-cred text-sm font-mono text-gray-500">${co.c}</span>
                         </div>
                     </label>`).join('');
                 return `
@@ -286,16 +322,38 @@
 
         let state = { sub: 0, cred: 0, areas: 0 };
 
+        // 체크됐지만 법정과목 자리가 이미 다른 과목으로 채워져 인정되지 않는 행 표시
+        function markDup(cb, dup) {
+            const row = cb.closest('.course-row');
+            const name = row.querySelector('.course-name');
+            row.querySelector('.dup-badge').classList.toggle('hidden', !dup);
+            name.classList.toggle('text-gray-400', dup);
+        }
+
         function calculate() {
             let totalSub = 0, totalCred = 0, areas = 0;
             document.querySelectorAll('.category-card').forEach(card => {
                 const minSub = +card.dataset.minSub, minCred = +card.dataset.minCred;
-                const groups = new Set();
-                let cred = 0;
+
+                // 법정과목(group) → 인정옵션(alt) → 체크된 학점 합
+                const groups = {};
                 card.querySelectorAll('.subject-cb').forEach(cb => {
-                    if (cb.checked) { groups.add(cb.dataset.group); cred += +cb.dataset.cred; }
+                    if (!cb.checked) { markDup(cb, false); return; }
+                    const alts = groups[cb.dataset.group] || (groups[cb.dataset.group] = {});
+                    const slot = alts[cb.dataset.alt] || (alts[cb.dataset.alt] = { cred: 0, els: [] });
+                    slot.cred += +cb.dataset.cred;
+                    slot.els.push(cb);
                 });
-                const subCount = groups.size;
+
+                let cred = 0, subCount = 0;
+                Object.values(groups).forEach(alts => {
+                    subCount++; // 법정과목당 1과목만 인정
+                    const entries = Object.entries(alts);
+                    let bestKey = entries[0][0];
+                    entries.forEach(([k, v]) => { if (v.cred > alts[bestKey].cred) bestKey = k; });
+                    cred += alts[bestKey].cred; // 학점도 인정되는 옵션 하나만
+                    entries.forEach(([k, v]) => v.els.forEach(el => markDup(el, k !== bestKey)));
+                });
                 const met = subCount >= minSub && cred >= minCred;
                 card.querySelector('.card-sub-val').textContent = subCount;
                 card.querySelector('.card-cred-val').textContent = cred;
